@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | AgendeFácil</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+    <div id="app">
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <i data-lucide="calendar-check-2"></i>
+                    <span>Agende<span class="logo-accent">Fácil</span>
+                        <small style="font-size:0.45em;opacity:0.5;margin-left:6px;letter-spacing:2px;">ADMIN</small>
+                    </span>
+                </div>
+                <div class="nav-actions">
+                    <span id="admin-greeting" style="font-size:0.9rem;color:var(--secondary);"></span>
+                    <a href="index.html" class="btn-secondary"><i data-lucide="external-link" style="width:16px;height:16px;"></i> Ver Site</a>
+                    <button id="theme-toggle" class="btn-icon">
+                        <i data-lucide="sun" class="sun-icon"></i>
+                        <i data-lucide="moon" class="moon-icon"></i>
+                    </button>
+                    <button class="btn-danger" onclick="adminLogout()" style="padding:0.6rem 1.2rem;border-radius:var(--radius);">
+                        <i data-lucide="log-out" style="width:16px;height:16px;"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container admin-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar glass">
+                <ul class="side-nav">
+                    <li><a href="#" data-tab="dashboard" class="active"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+                    <li><a href="#" data-tab="business"><i data-lucide="store"></i> Minha Empresa</a></li>
+                    <li><a href="#" data-tab="services"><i data-lucide="scissors"></i> Serviços</a></li>
+                    <li><a href="#" data-tab="appointments"><i data-lucide="calendar"></i> Agendamentos</a></li>
+                    <li><a href="#" data-tab="settings"><i data-lucide="settings"></i> Configurações</a></li>
+                    <li><a href="#" data-tab="account"><i data-lucide="user-cog"></i> Minha Conta</a></li>
+                </ul>
+            </aside>
+
+            <section class="content">
+
+                <!-- TAB: Dashboard -->
+                <div id="tab-dashboard" class="tab-content active">
+                    <div class="stats-row">
+                        <div class="stat-card glass">
+                            <h4>Agendamentos Hoje</h4>
+                            <div class="value" id="stat-today">0</div>
+                        </div>
+                        <div class="stat-card glass">
+                            <h4>Pendentes</h4>
+                            <div class="value" id="stat-pending" style="color:var(--warning);">0</div>
+                        </div>
+                        <div class="stat-card glass">
+                            <h4>Total Geral</h4>
+                            <div class="value" id="stat-total" style="color:var(--primary);">0</div>
+                        </div>
+                    </div>
+                    <div class="glass" style="padding:1.5rem;">
+                        <h3 style="font-family:var(--font-heading);margin-bottom:1rem;">Próximos Agendamentos</h3>
+                        <div style="overflow-x:auto;">
+                            <table class="appointments-table">
+                                <thead><tr><th>Cliente</th><th>Data & Hora</th><th>Serviço</th><th>Status</th><th>Ações</th></tr></thead>
+                                <tbody id="dashboard-table-body">
+                                    <tr><td colspan="5" class="empty-state">Nenhum agendamento.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Business Profile -->
+                <div id="tab-business" class="tab-content">
+                    <h2 style="font-family:var(--font-heading);margin-bottom:1.5rem;">Minha Empresa</h2>
+                    <div class="settings-grid">
+                        <div class="setting-card glass">
+                            <h4><i data-lucide="building" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Informações</h4>
+                            <div class="form-group">
+                                <label for="biz-name">Nome da Empresa</label>
+                                <input type="text" id="biz-name" placeholder="Ex: Salão da Maria">
+                            </div>
+                            <div class="form-group">
+                                <label for="biz-description">Descrição</label>
+                                <textarea id="biz-description" placeholder="Descreva sua empresa..."></textarea>
+                            </div>
+                        </div>
+                        <div class="setting-card glass">
+                            <h4><i data-lucide="contact" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Contato</h4>
+                            <div class="form-group">
+                                <label for="biz-phone">Telefone / WhatsApp</label>
+                                <input type="tel" id="biz-phone" placeholder="(11) 99999-9999">
+                            </div>
+                            <div class="form-group">
+                                <label for="biz-address">Endereço</label>
+                                <input type="text" id="biz-address" placeholder="Rua, número, bairro...">
+                            </div>
+                        </div>
+                    </div>
+                    <button id="save-business-btn" class="btn-primary" style="margin-top:1.5rem;width:100%;max-width:400px;">
+                        <i data-lucide="save" style="width:16px;height:16px;"></i> Salvar Informações da Empresa
+                    </button>
+                </div>
+
+                <!-- TAB: Services -->
+                <div id="tab-services" class="tab-content">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                        <h2 style="font-family:var(--font-heading);">Meus Serviços</h2>
+                        <button class="btn-primary" onclick="openServiceModal()">
+                            <i data-lucide="plus" style="width:16px;height:16px;"></i> Novo Serviço
+                        </button>
+                    </div>
+                    <div id="admin-services-container" class="admin-services-list">
+                        <div class="empty-state">Nenhum serviço cadastrado. Clique em "Novo Serviço" para começar.</div>
+                    </div>
+                </div>
+
+                <!-- TAB: Appointments -->
+                <div id="tab-appointments" class="tab-content">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                        <h2 style="font-family:var(--font-heading);">Todos os Agendamentos</h2>
+                        <select id="filter-status" style="padding:0.5rem 1rem;border-radius:10px;border:1px solid var(--border);background:var(--input);font-family:inherit;cursor:pointer;">
+                            <option value="all">Todos</option>
+                            <option value="pending">Pendentes</option>
+                            <option value="confirmed">Confirmados</option>
+                            <option value="cancelled">Cancelados</option>
+                        </select>
+                    </div>
+                    <div class="glass" style="padding:1.5rem;overflow-x:auto;">
+                        <table class="appointments-table">
+                            <thead><tr><th>Cliente</th><th>Data & Hora</th><th>Serviço</th><th>Status</th><th>Ações</th></tr></thead>
+                            <tbody id="appointments-table-body">
+                                <tr><td colspan="5" class="empty-state">Nenhum agendamento.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: Settings -->
+                <div id="tab-settings" class="tab-content">
+                    <h2 style="font-family:var(--font-heading);margin-bottom:1.5rem;">Configurações da Agenda</h2>
+                    <div class="settings-grid">
+                        <div class="setting-card glass">
+                            <h4><i data-lucide="calendar-days" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Dias de Trabalho</h4>
+                            <p style="color:var(--secondary);font-size:0.85rem;margin-bottom:1rem;">Ative ou desative os dias em que você atende.</p>
+                            <ul class="day-toggle-list" id="day-toggles"></ul>
+                        </div>
+                        <div class="setting-card glass">
+                            <h4><i data-lucide="clock" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Horário de Atendimento</h4>
+                            <p style="color:var(--secondary);font-size:0.85rem;margin-bottom:1rem;">Defina o horário de início e fim.</p>
+                            <div class="time-range-row">
+                                <label>Início:</label>
+                                <select id="start-hour"></select>
+                            </div>
+                            <div class="time-range-row">
+                                <label>Fim:</label>
+                                <select id="end-hour"></select>
+                            </div>
+                            <button id="save-hours-btn" class="btn-primary" style="margin-top:1rem;width:100%;">
+                                <i data-lucide="save" style="width:16px;height:16px;"></i> Salvar Horários
+                            </button>
+                        </div>
+                        <div class="setting-card glass" style="grid-column:1/-1;">
+                            <h4><i data-lucide="calendar-x" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Datas Bloqueadas</h4>
+                            <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+                                <input type="date" id="block-date-input" style="padding:0.5rem 1rem;border-radius:10px;border:1px solid var(--border);background:var(--input);font-family:inherit;">
+                                <button id="add-blocked-date" class="btn-primary">
+                                    <i data-lucide="plus" style="width:16px;height:16px;"></i> Bloquear Data
+                                </button>
+                            </div>
+                            <div class="blocked-dates-list" id="blocked-dates-list">
+                                <p class="empty-state">Nenhuma data bloqueada.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Minha Conta -->
+                <div id="tab-account" class="tab-content">
+                    <h2 style="font-family:var(--font-heading);margin-bottom:1.5rem;">Minha Conta</h2>
+                    <div class="settings-grid">
+                        <div class="setting-card glass">
+                            <h4><i data-lucide="mail" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Alterar E-mail</h4>
+                            <p style="color:var(--secondary);font-size:0.85rem;margin-bottom:1rem;">Atualize o e-mail de acesso à sua conta.</p>
+                            <div class="form-group">
+                                <label for="account-current-email">E-mail Atual</label>
+                                <input type="email" id="account-current-email" readonly style="opacity:0.6;cursor:not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label for="account-new-email">Novo E-mail</label>
+                                <input type="email" id="account-new-email" placeholder="novo@email.com">
+                            </div>
+                            <div id="email-error" class="error-message" style="margin-bottom:0.75rem;"><i data-lucide="alert-circle" style="width:16px;height:16px;flex-shrink:0;"></i> <span id="email-error-text"></span></div>
+                            <div id="email-success" class="success-msg" style="margin-bottom:0.75rem;"><i data-lucide="check-circle" style="width:16px;height:16px;flex-shrink:0;"></i> <span>E-mail atualizado!</span></div>
+                            <button id="save-email-btn" class="btn-primary" style="width:100%;">
+                                <i data-lucide="save" style="width:16px;height:16px;"></i> Salvar E-mail
+                            </button>
+                        </div>
+                        <div class="setting-card glass">
+                            <h4><i data-lucide="lock" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Alterar Senha</h4>
+                            <p style="color:var(--secondary);font-size:0.85rem;margin-bottom:1rem;">Defina uma nova senha para sua conta.</p>
+                            <div class="form-group">
+                                <label for="account-current-pass">Senha Atual</label>
+                                <input type="password" id="account-current-pass" placeholder="Digite sua senha atual">
+                            </div>
+                            <div class="form-group">
+                                <label for="account-new-pass">Nova Senha</label>
+                                <input type="password" id="account-new-pass" placeholder="Mínimo 6 caracteres">
+                            </div>
+                            <div class="form-group">
+                                <label for="account-confirm-pass">Confirmar Nova Senha</label>
+                                <input type="password" id="account-confirm-pass" placeholder="Repita a nova senha">
+                            </div>
+                            <div id="pass-error" class="error-message" style="margin-bottom:0.75rem;"><i data-lucide="alert-circle" style="width:16px;height:16px;flex-shrink:0;"></i> <span id="pass-error-text"></span></div>
+                            <div id="pass-success" class="success-msg" style="margin-bottom:0.75rem;"><i data-lucide="check-circle" style="width:16px;height:16px;flex-shrink:0;"></i> <span>Senha atualizada!</span></div>
+                            <button id="save-pass-btn" class="btn-primary" style="width:100%;">
+                                <i data-lucide="save" style="width:16px;height:16px;"></i> Salvar Senha
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- Service Modal -->
+    <div id="service-modal" class="modal-overlay">
+        <div class="modal-content glass">
+            <button class="close-modal" onclick="document.getElementById('service-modal').classList.remove('active')"><i data-lucide="x"></i></button>
+            <h3 id="service-modal-title">Novo Serviço</h3>
+            <form id="service-form">
+                <input type="hidden" id="svc-edit-id">
+                <div class="form-group">
+                    <label for="svc-name">Nome do Serviço</label>
+                    <input type="text" id="svc-name" required placeholder="Ex: Corte Masculino">
+                </div>
+                <div class="form-group">
+                    <label for="svc-description">Descrição</label>
+                    <textarea id="svc-description" placeholder="Descreva o serviço..."></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                    <div class="form-group">
+                        <label for="svc-price">Preço (R$)</label>
+                        <input type="number" id="svc-price" required placeholder="50.00" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="svc-duration">Duração (min)</label>
+                        <input type="number" id="svc-duration" required placeholder="60" min="10" step="10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Foto do Serviço</label>
+                    <div class="img-upload-area" id="svc-upload-area">
+                        <img id="svc-img-preview" src="" alt="" style="display:none;">
+                        <p id="svc-upload-text"><i data-lucide="upload" style="width:20px;height:20px;"></i><br>Enviar foto</p>
+                        <input type="file" id="svc-file-input" accept="image/*">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary full-width">Salvar Serviço</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="admin-toast" class="toast-message">
+        <i data-lucide="check-circle"></i>
+        <span id="admin-toast-text">Salvo!</span>
+    </div>
+
+    <script>
+        (function() {
+            const user = JSON.parse(localStorage.getItem('agendafacil_currentUser') || 'null');
+            if (!user) { window.location.href = 'login.html'; return; }
+            if (user.role !== 'admin') { window.location.href = 'index.html'; return; }
+            const el = document.getElementById('admin-greeting');
+            if (el) el.textContent = `Olá, ${user.name.split(' ')[0]}!`;
+        })();
+        function adminLogout() {
+            localStorage.removeItem('agendafacil_currentUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+    <script src="admin.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

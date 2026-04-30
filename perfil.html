@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seu Perfil | AgendeFácil</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        .profile-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .profile-card {
+            width: 100%;
+            max-width: 600px;
+            padding: 2.5rem;
+            position: relative;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-header h1 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-header p {
+            color: var(--secondary);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-header .subtitle {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Category Grid */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .category-item:hover .category-img {
+            transform: scale(1.08);
+        }
+
+        .category-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .category-item.selected .category-img {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .category-item.selected .category-name {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        /* Checkmark overlay */
+        .img-wrapper {
+            position: relative;
+        }
+
+        .check-overlay {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .category-item.selected .check-overlay {
+            display: flex;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .selection-counter {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        .counter-num {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .btn-continue {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+
+        .btn-continue:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--secondary);
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: var(--foreground); }
+        body.dark-theme .close-btn:hover { color: var(--foreground-dark); }
+
+        @media (max-width: 500px) {
+            .categories-grid { gap: 1rem; }
+            .category-img { width: 85px; height: 85px; }
+            .category-name { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+
+    <div class="profile-page">
+        <div class="profile-card glass">
+            <button class="close-btn" onclick="skipProfile()">
+                <i data-lucide="x" style="width:28px;height:28px;"></i>
+            </button>
+
+            <div class="profile-header">
+                <h1>O que está no seu radar de <span class="gradient-text">autocuidado</span>?</h1>
+                <p>Selecione até <span class="subtitle">5 categorias</span> do seu interesse e mostraremos sugestões personalizadas para você.</p>
+            </div>
+
+            <div class="categories-grid" id="categories-grid">
+                <div class="category-item" data-category="barbeiros" onclick="toggleCategory(this)">
+                    <div class="img-wrapper">
+                        <img class="category-img" src="img/barbeiros.png" alt="Barbeiros">
+                        <div class="check-overlay"><i data-lucide="check" style="width:16px;height:16px;"></i></div>
+                    </div>
+                    <span class="category-name">Barbeiros</span>
+                </div>
+
+                <div class="category-item" data-category="cabeleireiro" onclick="toggleCategory(this)">
+                    <div class="img-wrapper">
+                        <img class="category-img" src="img/cabeleireiro.png" alt="Cabeleireiro">
+                        <div class="check-overlay"><i data-lucide="check" style="width:16px;height:16px;"></i></div>
+                    </div>
+                    <span class="category-name">Cabeleireiro</span>
+                </div>
+
+                <div class="category-item" data-category="saude" onclick="toggleCategory(this)">
+                    <div class="img-wrapper">
+                        <img class="category-img" src="img/saude.png" alt="Saúde e bem-estar">
+                        <div class="check-overlay"><i data-lucide="check" style="width:16px;height:16px;"></i></div>
+                    </div>
+                    <span class="category-name">Saúde e bem-estar</span>
+                </div>
+
+                <div class="category-item" data-category="spa" onclick="toggleCategory(this)">
+                    <div class="img-wrapper">
+                        <img class="category-img" src="img/spa.png" alt="Dia de SPA">
+                        <div class="check-overlay"><i data-lucide="check" style="width:16px;height:16px;"></i></div>
+                    </div>
+                    <span class="category-name">Dia de SPA</span>
+                </div>
+
+                <div class="category-item" data-category="pele" onclick="toggleCategory(this)">
+                    <div class="img-wrapper">
+                        <img class="category-img" src="img/pele.png" alt="Cuidados com a pele">
+                        <div class="check-overlay"><i data-lucide="check" style="width:16px;height:16px;"></i></div>
+                    </div>
+                    <span class="category-name">Cuidados com a pele</span>
+                </div>
+
+                <div class="category-item" data-category="manicure" onclick="toggleCategory(this)">
+                    <div class="img-wrapper">
+                        <img class="category-img" src="img/manicure.png" alt="Manicure">
+                        <div class="check-overlay"><i data-lucide="check" style="width:16px;height:16px;"></i></div>
+                    </div>
+                    <span class="category-name">Manicure</span>
+                </div>
+
+                <div class="category-item" data-category="sobrancelhas" onclick="toggleCategory(this)">
+                    <div class="img-wrapper">
+                        <img class="category-img" src="img/sobrancelhas.png" alt="Sobrancelhas e cílios">
+                        <div class="check-overlay"><i data-lucide="check" style="width:16px;height:16px;"></i></div>
+                    </div>
+                    <span class="category-name">Sobrancelhas e cílios</span>
+                </div>
+
+                <div class="category-item" data-category="maquiagem" onclick="toggleCategory(this)">
+                    <div class="img-wrapper">
+                        <img class="category-img" src="img/maquiagem.png" alt="Maquiagem">
+                        <div class="check-overlay"><i data-lucide="check" style="width:16px;height:16px;"></i></div>
+                    </div>
+                    <span class="category-name">Maquiagem</span>
+                </div>
+            </div>
+
+            <div class="selection-counter">
+                <span class="counter-num" id="count">0</span> / 5 selecionadas
+            </div>
+
+            <button id="continue-btn" class="btn-primary btn-continue" disabled onclick="saveAndContinue()">
+                Continuar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Auth check
+        (function() {
+            const user = JSON.parse(localStorage.getItem('agendafacil_currentUser') || 'null');
+            if (!user) { window.location.href = 'login.html'; return; }
+            if (user.role === 'admin') { window.location.href = 'admin.html'; return; }
+            // If already completed profile, go to main
+            if (user.profileComplete) { window.location.href = 'index.html'; return; }
+        })();
+
+        // Theme
+        (function() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            if (saved === 'dark') document.body.classList.add('dark-theme');
+            else document.body.classList.remove('dark-theme');
+        })();
+
+        let selectedCategories = [];
+
+        function toggleCategory(el) {
+            const cat = el.getAttribute('data-category');
+
+            if (el.classList.contains('selected')) {
+                // Deselect
+                el.classList.remove('selected');
+                selectedCategories = selectedCategories.filter(c => c !== cat);
+            } else {
+                // Check max
+                if (selectedCategories.length >= 5) return;
+                el.classList.add('selected');
+                selectedCategories.push(cat);
+            }
+
+            updateCounter();
+            // Re-render check icons
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function updateCounter() {
+            document.getElementById('count').textContent = selectedCategories.length;
+            document.getElementById('continue-btn').disabled = selectedCategories.length === 0;
+        }
+
+        function saveAndContinue() {
+            if (selectedCategories.length === 0) return;
+
+            // Save categories to user profile
+            const user = JSON.parse(localStorage.getItem('agendafacil_currentUser'));
+            user.categories = selectedCategories;
+            user.profileComplete = true;
+            localStorage.setItem('agendafacil_currentUser', JSON.stringify(user));
+
+            // Also update in users list
+            const users = JSON.parse(localStorage.getItem('agendafacil_users') || '[]');
+            const idx = users.findIndex(u => u.id === user.id);
+            if (idx !== -1) {
+                users[idx].categories = selectedCategories;
+                users[idx].profileComplete = true;
+                localStorage.setItem('agendafacil_users', JSON.stringify(users));
+            }
+
+            window.location.href = 'index.html';
+        }
+
+        function skipProfile() {
+            const user = JSON.parse(localStorage.getItem('agendafacil_currentUser'));
+            user.profileComplete = true;
+            localStorage.setItem('agendafacil_currentUser', JSON.stringify(user));
+            window.location.href = 'index.html';
+        }
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>

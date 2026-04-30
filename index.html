@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgendeFácil | Agendamento Premium</title>
+    <meta name="description" content="Encontre os melhores profissionais e agende em segundos.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <i data-lucide="calendar-check-2"></i>
+                    <span>Agende<span class="logo-accent">Fácil</span></span>
+                </div>
+                <div class="nav-actions">
+                    <span id="user-greeting" style="font-size:0.9rem;color:var(--secondary);"></span>
+                    <button id="theme-toggle" class="btn-icon" title="Alternar tema">
+                        <i data-lucide="sun" class="sun-icon"></i>
+                        <i data-lucide="moon" class="moon-icon"></i>
+                    </button>
+                    <button class="btn-secondary" onclick="logout()" style="cursor:pointer;">
+                        <i data-lucide="log-out" style="width:16px;height:16px;"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container">
+
+            <!-- ========== VIEW 1: BUSINESSES LIST ========== -->
+            <div id="view-businesses" class="view active">
+                <section class="hero">
+                    <h1>Encontre o profissional <span class="gradient-text">perfeito</span></h1>
+                    <p>Explore empresas e serviços perto de você e agende com um toque.</p>
+                </section>
+
+                <div class="search-bar glass" style="margin-bottom:2rem;">
+                    <i data-lucide="search" style="color:var(--secondary);"></i>
+                    <input type="text" id="search-input" placeholder="Buscar por nome ou serviço..." style="flex:1;background:transparent;border:none;font-family:inherit;font-size:1rem;color:inherit;outline:none;">
+                </div>
+
+                <div id="businesses-grid" class="businesses-grid">
+                    <!-- Injected by JS -->
+                </div>
+
+                <div id="no-businesses" class="empty-state-large" style="display:none;">
+                    <i data-lucide="store" style="width:64px;height:64px;opacity:0.3;"></i>
+                    <h3>Nenhuma empresa cadastrada ainda</h3>
+                    <p>Em breve teremos profissionais disponíveis para você!</p>
+                </div>
+            </div>
+
+            <!-- ========== VIEW 2: BUSINESS DETAIL + SERVICES ========== -->
+            <div id="view-business-detail" class="view">
+                <button class="btn-back" onclick="showView('businesses')">
+                    <i data-lucide="arrow-left"></i> Voltar
+                </button>
+
+                <div class="business-hero glass" id="business-hero">
+                    <!-- Injected by JS -->
+                </div>
+
+                <h2 style="font-family:var(--font-heading);margin:2rem 0 1rem;">Serviços</h2>
+                <div id="services-list" class="services-list">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- ========== VIEW 3: CALENDAR + TIME SLOTS ========== -->
+            <div id="view-booking" class="view">
+                <button class="btn-back" id="back-to-services">
+                    <i data-lucide="arrow-left"></i> Voltar aos serviços
+                </button>
+
+                <div class="selected-service-banner glass" id="selected-service-banner">
+                    <!-- Injected by JS -->
+                </div>
+
+                <div class="booking-layout">
+                    <div class="calendar-panel glass">
+                        <div class="calendar-header">
+                            <button id="prev-month" class="btn-icon"><i data-lucide="chevron-left"></i></button>
+                            <h3 id="current-month-year">Abril 2026</h3>
+                            <button id="next-month" class="btn-icon"><i data-lucide="chevron-right"></i></button>
+                        </div>
+                        <div class="calendar-grid-header">
+                            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+                        </div>
+                        <div id="calendar-days" class="calendar-grid"></div>
+                    </div>
+
+                    <div id="time-panel" class="time-panel glass">
+                        <div id="time-placeholder" class="time-placeholder">
+                            <i data-lucide="clock" style="width:48px;height:48px;opacity:0.3;"></i>
+                            <p>Selecione um dia no calendário</p>
+                        </div>
+                        <div id="time-content" class="time-content" style="display:none;">
+                            <h3 id="selected-date-display"></h3>
+                            <div id="time-slots" class="slots-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="container">
+            <p>&copy; 2026 AgendeFácil. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay">
+        <div class="modal-content glass">
+            <button class="close-modal" onclick="document.getElementById('confirmation-modal').classList.remove('active')"><i data-lucide="x"></i></button>
+            <h3>Confirmar Agendamento</h3>
+            <form id="booking-form">
+                <div class="form-group">
+                    <label for="user-name">Nome Completo</label>
+                    <input type="text" id="user-name" required placeholder="Ex: João Silva">
+                </div>
+                <div class="form-group">
+                    <label for="user-email">E-mail</label>
+                    <input type="email" id="user-email" required placeholder="joao@exemplo.com">
+                </div>
+                <div class="form-group">
+                    <label for="user-phone">WhatsApp</label>
+                    <input type="tel" id="user-phone" required placeholder="(11) 99999-9999">
+                </div>
+                <div class="booking-summary" id="booking-summary-content">
+                    <p><i data-lucide="store"></i> <span id="summary-business">Empresa</span></p>
+                    <p><i data-lucide="scissors"></i> <span id="summary-service">Serviço</span></p>
+                </div>
+                <div class="booking-summary">
+                    <p><i data-lucide="calendar"></i> <span id="summary-date">--/--/----</span></p>
+                    <p><i data-lucide="clock"></i> <span id="summary-time">--:--</span></p>
+                </div>
+                <button type="submit" class="btn-primary full-width">Finalizar Agendamento</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="success-message" class="toast-message">
+        <i data-lucide="check-circle"></i>
+        <span>Agendamento realizado com sucesso!</span>
+    </div>
+
+    <script>
+        (function() {
+            const user = JSON.parse(localStorage.getItem('agendafacil_currentUser') || 'null');
+            if (!user) { window.location.href = 'login.html'; return; }
+            if (user.role === 'admin') { window.location.href = 'admin.html'; return; }
+        })();
+        function logout() {
+            localStorage.removeItem('agendafacil_currentUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+    <script src="app.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
