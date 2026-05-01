@@ -115,9 +115,29 @@ function renderStats() {
     const bookings = getBookings().filter(b => b.businessId === admin.id);
     const today = new Date().toISOString().split('T')[0];
 
-    document.getElementById('stat-today').textContent = String(bookings.filter(b => b.date === today && b.status !== 'cancelled').length).padStart(2, '0');
-    document.getElementById('stat-pending').textContent = String(bookings.filter(b => b.status === 'pending').length).padStart(2, '0');
-    document.getElementById('stat-total').textContent = String(bookings.length).padStart(2, '0');
+    const todayCount = bookings.filter(b => b.date === today && b.status !== 'cancelled').length;
+    const pendingCount = bookings.filter(b => b.status === 'pending').length;
+    const totalCount = bookings.length;
+
+    animateCounter('stat-today', todayCount);
+    animateCounter('stat-pending', pendingCount);
+    animateCounter('stat-total', totalCount);
+}
+
+function animateCounter(elementId, target) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const duration = 600;
+    const start = performance.now();
+    const from = parseInt(el.textContent) || 0;
+
+    function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = String(Math.round(from + (target - from) * eased)).padStart(2, '0');
+        if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
 }
 
 // =============================================

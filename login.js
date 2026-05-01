@@ -241,6 +241,117 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
 })();
 
 // =============================================
+// Password Strength Indicator
+// =============================================
+(function setupPasswordStrength() {
+    const input = document.getElementById('register-password');
+    const container = document.getElementById('password-strength');
+    const label = document.getElementById('strength-text');
+    if (!input || !container) return;
+
+    input.addEventListener('input', () => {
+        const val = input.value;
+        container.className = '';
+        if (val.length === 0) { label.textContent = ''; return; }
+
+        let score = 0;
+        if (val.length >= 6) score++;
+        if (val.length >= 10) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        if (score <= 2) { container.className = 'strength-weak'; label.textContent = 'Fraca'; }
+        else if (score <= 3) { container.className = 'strength-medium'; label.textContent = 'Média'; }
+        else { container.className = 'strength-strong'; label.textContent = 'Forte'; }
+    });
+})();
+
+// =============================================
+// Social Login (Google & Facebook via Firebase)
+// =============================================
+function handleSocialLogin(provider) {
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+        showLoginError('Firebase não configurado. Configure o firebase-config.js com suas credenciais.');
+        return;
+    }
+
+    const config = firebase.app().options;
+    if (!config.apiKey || config.apiKey === 'SUA_API_KEY') {
+        showLoginError('Configure suas credenciais Firebase em firebase-config.js para ativar login social.');
+        return;
+    }
+
+    firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+            const fbUser = result.user;
+            const users = getUsers();
+
+            // Check if user already exists
+            let user = users.find(u => u.email === fbUser.email);
+
+            if (!user) {
+                // Create new user from social login
+                user = {
+                    id: Date.now(),
+                    name: fbUser.displayName || 'Usuário',
+                    email: fbUser.email,
+                    phone: fbUser.phoneNumber || '',
+                    password: '__social_' + Date.now(),
+                    role: 'client',
+                    photoURL: fbUser.photoURL || '',
+                    socialProvider: result.additionalUserInfo?.providerId || 'social',
+                    createdAt: new Date().toISOString()
+                };
+                users.push(user);
+                saveUsers(users);
+            }
+
+            // Save session
+            setCurrentUser({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                photoURL: user.photoURL || fbUser.photoURL || '',
+                profileComplete: user.profileComplete || false,
+                categories: user.categories || []
+            });
+
+            // Redirect
+            if (user.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else if (!user.profileComplete) {
+                window.location.href = 'perfil.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        })
+        .catch((error) => {
+            console.error('Social login error:', error);
+            if (error.code === 'auth/popup-closed-by-user') return;
+            if (error.code === 'auth/account-exists-with-different-credential') {
+                showLoginError('Este e-mail já está vinculado a outro método de login.');
+            } else {
+                showLoginError('Erro ao fazer login. Tente novamente.');
+            }
+        });
+}
+
+// Google Login
+document.getElementById('google-login-btn')?.addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    handleSocialLogin(provider);
+});
+
+// Facebook Login
+document.getElementById('facebook-login-btn')?.addEventListener('click', () => {
+    const provider = new firebase.auth.FacebookAuthProvider();
+    handleSocialLogin(provider);
+});
+
+// =============================================
 // Auto-redirect if already logged in
 // =============================================
 (function checkAuth() {
@@ -255,3 +366,4 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
         }
     }
 })();
+

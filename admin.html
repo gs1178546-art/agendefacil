@@ -14,6 +14,10 @@
 </head>
 <body class="dark-theme">
     <div id="app">
+        <!-- Floating Orbs -->
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+
         <nav class="navbar">
             <div class="container">
                 <div class="logo">
@@ -32,9 +36,25 @@
                     <button class="btn-danger" onclick="adminLogout()" style="padding:0.6rem 1.2rem;border-radius:var(--radius);">
                         <i data-lucide="log-out" style="width:16px;height:16px;"></i> Sair
                     </button>
+                    <button class="hamburger" id="hamburger-btn" onclick="toggleAdminMobileMenu()">
+                        <span></span><span></span><span></span>
+                    </button>
                 </div>
             </div>
         </nav>
+
+        <!-- Mobile Drawer -->
+        <div class="drawer-overlay" id="drawer-overlay" onclick="toggleAdminMobileMenu()"></div>
+        <div class="mobile-drawer" id="mobile-drawer">
+            <a href="#" onclick="mobileNavTo('dashboard')"><i data-lucide="layout-dashboard" style="width:18px;height:18px;"></i> Dashboard</a>
+            <a href="#" onclick="mobileNavTo('business')"><i data-lucide="store" style="width:18px;height:18px;"></i> Minha Empresa</a>
+            <a href="#" onclick="mobileNavTo('services')"><i data-lucide="scissors" style="width:18px;height:18px;"></i> Serviços</a>
+            <a href="#" onclick="mobileNavTo('appointments')"><i data-lucide="calendar" style="width:18px;height:18px;"></i> Agendamentos</a>
+            <a href="#" onclick="mobileNavTo('settings')"><i data-lucide="settings" style="width:18px;height:18px;"></i> Configurações</a>
+            <a href="#" onclick="mobileNavTo('account')"><i data-lucide="user-cog" style="width:18px;height:18px;"></i> Minha Conta</a>
+            <a href="index.html"><i data-lucide="external-link" style="width:18px;height:18px;"></i> Ver Site</a>
+            <a href="#" onclick="adminLogout()"><i data-lucide="log-out" style="width:18px;height:18px;"></i> Sair</a>
+        </div>
 
         <main class="container admin-layout">
             <!-- Sidebar -->
@@ -289,6 +309,21 @@
         function adminLogout() {
             localStorage.removeItem('agendafacil_currentUser');
             window.location.href = 'login.html';
+        }
+        function toggleAdminMobileMenu() {
+            document.getElementById('hamburger-btn').classList.toggle('active');
+            document.getElementById('mobile-drawer').classList.toggle('open');
+            document.getElementById('drawer-overlay').classList.toggle('open');
+            if (window.lucide) lucide.createIcons();
+        }
+        function mobileNavTo(tab) {
+            toggleAdminMobileMenu();
+            document.querySelectorAll('.side-nav a').forEach(l => l.classList.remove('active'));
+            const link = document.querySelector(`.side-nav a[data-tab="${tab}"]`);
+            if (link) link.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            if (window.lucide) lucide.createIcons();
         }
     </script>
     <script src="admin.js"></script>

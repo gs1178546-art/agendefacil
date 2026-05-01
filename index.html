@@ -15,6 +15,11 @@
 </head>
 <body class="dark-theme">
     <div id="app">
+        <!-- Floating Orbs -->
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+
         <!-- Navigation -->
         <nav class="navbar">
             <div class="container">
@@ -31,9 +36,19 @@
                     <button class="btn-secondary" onclick="logout()" style="cursor:pointer;">
                         <i data-lucide="log-out" style="width:16px;height:16px;"></i> Sair
                     </button>
+                    <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">
+                        <span></span><span></span><span></span>
+                    </button>
                 </div>
             </div>
         </nav>
+
+        <!-- Mobile Drawer -->
+        <div class="drawer-overlay" id="drawer-overlay" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-drawer" id="mobile-drawer">
+            <a href="#" onclick="toggleMobileMenu()"><i data-lucide="home" style="width:18px;height:18px;"></i> Início</a>
+            <a href="#" onclick="logout(); toggleMobileMenu()"><i data-lucide="log-out" style="width:18px;height:18px;"></i> Sair</a>
+        </div>
 
         <main class="container">
 
@@ -117,6 +132,11 @@
         <footer class="container">
             <p>&copy; 2026 AgendeFácil. Todos os direitos reservados.</p>
         </footer>
+
+        <!-- Scroll to top -->
+        <button class="scroll-top" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+            <i data-lucide="chevron-up"></i>
+        </button>
     </div>
 
     <!-- Confirmation Modal -->
@@ -166,6 +186,16 @@
             localStorage.removeItem('agendafacil_currentUser');
             window.location.href = 'login.html';
         }
+        function toggleMobileMenu() {
+            document.getElementById('hamburger-btn').classList.toggle('active');
+            document.getElementById('mobile-drawer').classList.toggle('open');
+            document.getElementById('drawer-overlay').classList.toggle('open');
+        }
+        // Scroll to top visibility
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('scroll-top-btn');
+            if (btn) btn.classList.toggle('visible', window.scrollY > 300);
+        });
     </script>
     <script src="app.js"></script>
     <script>lucide.createIcons();</script>

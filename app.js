@@ -90,9 +90,10 @@ function renderBusinesses() {
     noMsg.style.display = 'none';
     grid.innerHTML = '';
 
-    filtered.forEach(biz => {
+    filtered.forEach((biz, index) => {
         const card = document.createElement('div');
-        card.classList.add('business-card', 'glass');
+        card.classList.add('business-card', 'glass', 'stagger-in');
+        card.style.animationDelay = (index * 0.08) + 's';
         card.onclick = () => openBusinessDetail(biz.adminId);
 
         const firstServiceImg = (biz.services || []).find(s => s.image);
@@ -438,3 +439,35 @@ document.getElementById('next-month').addEventListener('click', () => {
 initTheme();
 loadUserSession();
 renderBusinesses();
+
+// =============================================
+// Confetti Effect
+// =============================================
+function launchConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+
+    const colors = ['#6366f1', '#a855f7', '#f43f5e', '#10b981', '#f59e0b', '#3b82f6'];
+    for (let i = 0; i < 50; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 0.8 + 's';
+        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        container.appendChild(piece);
+    }
+    setTimeout(() => container.remove(), 4000);
+}
+
+// Patch showToast to include confetti
+const _origShowToast = showToast;
+function showToast() {
+    _origShowToast();
+    launchConfetti();
+}
+

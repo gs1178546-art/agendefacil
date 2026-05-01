@@ -1,6 +1,9 @@
-// Configuração do Firebase
-// Para ativar o agendamento real, substitua os valores abaixo pelas credenciais do seu projeto Firebase.
-// Você pode encontrá-las no console do Firebase (Configurações do Projeto > Seus Aplicativos).
+// =============================================
+// Firebase Configuration (CDN compat mode)
+// =============================================
+// Para ativar login social (Google/Facebook), substitua os valores abaixo
+// pelas credenciais reais do seu projeto Firebase.
+// Console: https://console.firebase.google.com
 
 const firebaseConfig = {
     apiKey: "SUA_API_KEY",
@@ -11,5 +14,7 @@ const firebaseConfig = {
     appId: "SEU_APP_ID"
 };
 
-// Exportar para uso nos outros arquivos
-export default firebaseConfig;
+// Inicializar Firebase (só se os SDKs estiverem carregados)
+if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+}
